@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Order Exporter
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  Export Amazon order history to JSON/CSV
 // @url          https://raw.githubusercontent.com/IeuanK/AmazonExporter/refs/heads/main/userscript.js
 // @author       IeuanK
@@ -87,30 +87,28 @@
         }
         const orders = Object.values(data.orders);
         if (orders.length === 0) return "";
-
+    
         // Headers
-        const headers = ["OrderId", "Date", "Payee", "Notes", "Total", "Currency", "ItemCount", "ItemName", "Quantity", "Status", "StatusDate",];
-
+        const headers = ["OrderId", "Date", "Payee", "Notes", "Total", "Currency", "ItemCount"];
+    
         // Create rows
         const rows = [];
         orders.forEach(order => {
-            order.items.forEach(item => {
-                rows.push([
-                    order.orderId,
-                    order.orderDate,
-                    `Amazon`,
-                    `${order.orderId} - ${item.qty}x ${item.name} - ${item.status || "Unknown"}`,
-                    order.totalPrice,
-                    order.currency,
-                    order.items.length,
-                    item.name,
-                    item.qty,
-                    item.status,
-                    item.statusDate,
-                ].map(value => `"${value}"`)); // Wrap in quotes to handle commas in text
-            });
+            const itemNotes = order.items.map(item => 
+                `${item.qty}x ${item.name} - ${item.status || "Unknown"}`
+            ).join(", ");
+            
+            rows.push([
+                order.orderId,
+                order.orderDate,
+                `Amazon`,
+                `${order.orderId} - ${itemNotes}`,
+                order.totalPrice,
+                order.currency,
+                order.items.length
+            ].map(value => `"${value}"`)); // Wrap in quotes to handle commas in text
         });
-
+    
         return [headers.join(","), ...rows.map(row => row.join(","))].join("\n");
     };
 
