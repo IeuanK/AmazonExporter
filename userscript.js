@@ -3,7 +3,9 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.4
 // @description  Export Amazon order history to JSON/CSV
-// @url          https://raw.githubusercontent.com/IeuanK/AmazonExporter/refs/heads/main/userscript.js
+// @updateURL    https://github.com/IeuanK/AmazonExporter/blob/main/userscript.js
+// @downloadURL  https://github.com/IeuanK/AmazonExporter/blob/main/userscript.js
+// @supportURL   https://github.com/IeuanK/AmazonExporter/issues
 // @author       IeuanK
 // @match        https://www.amazon.com/*
 // @match        https://www.amazon.de/*
