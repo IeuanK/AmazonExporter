@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Order Exporter
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Export Amazon order history to JSON/CSV
 // @url          https://raw.githubusercontent.com/IeuanK/AmazonExporter/refs/heads/main/userscript.js
 // @author       IeuanK
@@ -89,7 +89,7 @@
         if (orders.length === 0) return "";
 
         // Headers
-        const headers = ["OrderId", "Date", "Total", "Currency", "ItemCount", "ItemName", "Quantity", "Status", "StatusDate", "Description"];
+        const headers = ["OrderId", "Date", "Payee", "Notes", "Total", "Currency", "ItemCount", "ItemName", "Quantity", "Status", "StatusDate",];
 
         // Create rows
         const rows = [];
@@ -98,6 +98,8 @@
                 rows.push([
                     order.orderId,
                     order.orderDate,
+                    `Amazon`,
+                    `${order.orderId} - ${item.qty}x ${item.name} - ${item.status || "Unknown"}`,
                     order.totalPrice,
                     order.currency,
                     order.items.length,
@@ -105,7 +107,6 @@
                     item.qty,
                     item.status,
                     item.statusDate,
-                    `${order.orderId} - ${item.name} - ${item.status || "Unknown"}`,
                 ].map(value => `"${value}"`)); // Wrap in quotes to handle commas in text
             });
         });
