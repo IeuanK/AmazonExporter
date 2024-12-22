@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Amazon Order Exporter
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.4.1
 // @description  Export Amazon order history to JSON/CSV
-// @updateURL    https://github.com/IeuanK/AmazonExporter/blob/main/userscript.js
-// @downloadURL  https://github.com/IeuanK/AmazonExporter/blob/main/userscript.js
+// @url          https://github.com/IeuanK/AmazonExporter/raw/main/userscript.js
+// @updateURL    https://github.com/IeuanK/AmazonExporter/raw/main/userscript.js
+// @downloadURL  https://github.com/IeuanK/AmazonExporter/raw/main/userscript.js
 // @supportURL   https://github.com/IeuanK/AmazonExporter/issues
 // @author       IeuanK
 // @match        https://www.amazon.com/*
@@ -707,7 +708,7 @@
     // Check if we're on an orders page
     if (
         window.location.href.match(/\/your-orders\/orders/) ||
-        window.location.href.match(/\/your-account\/order-history/)
+        window.location.href.match(/\/order-history/)
     ) {
         try {
             conLog(`Loading script`);
