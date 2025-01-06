@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name         Amazon Order Exporter
-// @namespace    http://tampermonkey.net/
 // @version      0.4.1
 // @description  Export Amazon order history to JSON/CSV
-// @url          https://github.com/IeuanK/AmazonExporter/raw/main/userscript.js
-// @updateURL    https://github.com/IeuanK/AmazonExporter/raw/main/userscript.js
-// @downloadURL  https://github.com/IeuanK/AmazonExporter/raw/main/userscript.js
-// @supportURL   https://github.com/IeuanK/AmazonExporter/issues
 // @author       IeuanK
+// @url          https://github.com/IeuanK/AmazonExporter/raw/main/AmazonExporter.user.js
+// @updateURL    https://github.com/IeuanK/AmazonExporter/raw/main/AmazonExporter.user.js
+// @downloadURL  https://github.com/IeuanK/AmazonExporter/raw/main/AmazonExporter.user.js
+// @supportURL   https://github.com/IeuanK/AmazonExporter/issues
 // @match        https://www.amazon.com/*
 // @match        https://www.amazon.de/*
 // @match        https://www.amazon.co.uk/*
