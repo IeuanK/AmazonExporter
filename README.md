@@ -5,7 +5,7 @@ Allows you to capture your Amazon orders, then store them as CSV or JSON file
 
 ### Installation & usage
 
-- Open the userscript URL: https://github.com/IeuanK/AmazonExporter/raw/main/userscript.js  
+- Open the userscript URL: https://github.com/IeuanK/AmazonExporter/raw/main/AmazonExporter.user.js  
 - Install userscript, either using your browser or an extension like TamperMonkey  
 - Log in to Amazon  
 - Go to your orders page
