@@ -3,10 +3,11 @@ CSV exporter user script for Amazon
 
 Allows you to capture your Amazon orders, then store them as CSV or JSON file
 
-### Other scripts
+### My scripts
 
-- [https://github.com/IeuanK/BolExporter](Bol.com Exporter)
-- [https://github.com/IeuanK/ICS-Exporter](ICS Cards Exporter)
+- [Amazon Exporter](https://github.com/IeuanK/AmazonExporter)
+- [Bol.com Exporter](https://github.com/IeuanK/BolExporter)
+- [ICS Cards Exporter](https://github.com/IeuanK/ICS-Exporter)
 
 ### Installation & usage
 
