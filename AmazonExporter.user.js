@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Amazon Order Exporter
-// @version      0.4.1
+// @version      0.4.2
 // @description  Export Amazon order history to JSON/CSV
 // @author       IeuanK
 // @url          https://github.com/IeuanK/AmazonExporter/raw/main/AmazonExporter.user.js
@@ -12,6 +12,7 @@
 // @match        https://www.amazon.co.uk/*
 // @match        https://www.amazon.nl/*
 // @grant        none
+// @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
 // ==/UserScript==
 
 (function () {
@@ -89,17 +90,17 @@
         }
         const orders = Object.values(data.orders);
         if (orders.length === 0) return "";
-    
+
         // Headers
         const headers = ["OrderId", "Date", "Payee", "Notes", "Total", "Currency", "ItemCount"];
-    
+
         // Create rows
         const rows = [];
         orders.forEach(order => {
-            const itemNotes = order.items.map(item => 
+            const itemNotes = order.items.map(item =>
                 `${item.qty}x ${item.name} - ${item.status || "Unknown"}`
             ).join(", ");
-            
+
             rows.push([
                 order.orderId,
                 order.orderDate,
@@ -110,7 +111,7 @@
                 order.items.length
             ].map(value => `"${value}"`)); // Wrap in quotes to handle commas in text
         });
-    
+
         return [headers.join(","), ...rows.map(row => row.join(","))].join("\n");
     };
 
@@ -142,6 +143,53 @@
             qty: qty,
         };
     };
+
+    const parseOrderDate = (dateText) => {
+        if (!dateText || typeof dateText !== "string") {
+            console.error("Invalid date text provided:", dateText);
+            return null;
+        }
+
+        // Define possible date formats
+        const possibleFormats = [
+            "MMMM D, YYYY", // e.g., "March 6, 2025"
+            "D MMMM YYYY", // e.g., "6 March 2025"
+            "MMM D, YYYY", // e.g., "Mar 6, 2025"
+            "D MMM YYYY",  // e.g., "6 Mar 2025"
+            "YYYY-MM-DD",  // e.g., "2025-03-06"
+        ];
+
+        // Attempt parsing
+        const trimmedDate = dateText.trim();
+        const parsedDate = moment(trimmedDate, possibleFormats, true); // Strict parsing
+
+        if (!parsedDate.isValid()) {
+            console.error("Failed to parse date with known formats:", trimmedDate);
+            return null; // Return null to signify invalid date
+        }
+
+        return parsedDate.toDate(); // Convert to native Date object
+    };
+
+    const formatDateFromParts = (part1, part2) => {
+        // Check if part1 is the day or the month
+        const isPart1Day = !isNaN(parseInt(part1, 10)); // If it's numeric, it's likely the day
+        const day = isPart1Day ? part1 : part2; // Assign day accordingly
+        const month = isPart1Day ? part2 : part1; // The other part becomes the month
+
+        // Attempt to create a Date object using the current year (assume 2024 for now)
+        const dateString = `${month} ${day} 2024`; // Month-Day-Year format
+        const dateObj = new Date(dateString);
+
+        if (!dateObj) {
+            console.error("Invalid date object created from:", part1, part2);
+            return ""; // Return an empty string or fallback date
+        }
+
+        // Format the date as MM-DD
+        return `${(dateObj.getMonth() + 1).toString().padStart(2, "0")}-${dateObj.getDate().toString().padStart(2, "0")}`;
+    }
+
 
     // Data capture
     const capturePage = async (captureButton) => {
@@ -220,15 +268,13 @@
                     throw new Error("Could not find date element");
                 }
                 const dateText = dateElem.textContent.trim();
-                const dateParts = dateText.split(" ");
-                const day = parseInt(dateParts[0]);
-                const month = {
-                    "January": 0, "February": 1, "March": 2, "April": 3, "May": 4, "June": 5,
-                    "July": 6, "August": 7, "September": 8, "October": 9, "November": 10, "December": 11,
-                }[dateParts[1]];
-                const year = parseInt(dateParts[2]);
-                const date = new Date(year, month, day);
-                const orderDate = date.toISOString().split("T")[0];
+                const orderDate = parseOrderDate(dateText);
+
+                if (!orderDate) {
+                    console.error("Could not parse order date:", dateText);
+                } else {
+                    console.log("Parsed Order Date:", orderDate);
+                }
 
                 // Initialize items array for this order
                 const items = [];
@@ -259,15 +305,21 @@
                         formattedStatusDate = `${(yesterday.getMonth() + 1).toString().padStart(2, "0")}-${yesterday.getDate().toString().padStart(2, "0")}`;
                     } else {
                         // Format date as MM-DD
-                        const statusDateParts = statusText.split(" ").filter(Boolean);
-                        const day = statusDateParts[1];
-                        const month = statusDateParts[2];
-                        if (day !== undefined && month !== undefined) {
-                            const statusDateObj = new Date(`${month} ${day} 2024`);
-                            formattedStatusDate = `${(statusDateObj.getMonth() + 1).toString().padStart(2, "0")}-${statusDateObj.getDate().toString().padStart(2, "0")}`;
+                        const statusDateParts = statusText.split(" ").filter(Boolean); // Split and clean up text
+                        const deliveryStatus = statusDateParts[0]; // First part is always the status (e.g., "Delivered")
+
+// Extract potential day and month values
+                        const possibleDay = statusDateParts[1];
+                        const possibleMonth = statusDateParts[2];
+
+// Use a helper method to parse the date properly
+                        let formattedStatusDate = "";
+                        if (possibleDay && possibleMonth) {
+                            formattedStatusDate = formatDateFromParts(possibleDay, possibleMonth);
                         } else {
-                            formattedStatusDate = `${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+                            console.warn("Could not extract delivery date properly from status:", statusText);
                         }
+
                     }
 
                     // Process each item in this delivery - try both old and new item selectors
