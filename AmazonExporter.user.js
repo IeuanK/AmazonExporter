@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Amazon Order Exporter
-// @version      0.4.3
+// @version      0.4.4
 // @description  Export Amazon order history to JSON/CSV
 // @author       IeuanK
 // @url          https://github.com/IeuanK/AmazonExporter/raw/main/AmazonExporter.user.js
@@ -124,14 +124,26 @@
     const getItemDetails = (itemBox) => {
         // Try various possible title selectors
         let titleElem = itemBox.querySelector(".yohtmlc-product-title") || itemBox.querySelector(".a-link-normal");
-        if (!titleElem) {
+
+        let name = "";
+        if (titleElem) {
+            name = titleElem.textContent.trim() || (titleElem.getAttribute("title") || "").trim();
+        }
+
+        // Grocery orders carry no text title — the product name lives in the image alt attribute
+        if (!name) {
+            const imgElem = itemBox.querySelector("img[alt]");
+            if (imgElem) {
+                name = (imgElem.getAttribute("alt") || "").trim();
+            }
+        }
+
+        if (!name) {
             throw new Error("Could not find item title");
         }
 
-        const name = titleElem.textContent.trim() || titleElem.getAttribute("title").trim();
-
         // Check for quantity indicator with fallbacks
-        const qtyElem = itemBox.querySelector(".product-image .product-image__qty, .quantity");
+        const qtyElem = itemBox.querySelector(".product-image__qty, .product-image .product-image__qty, .quantity");
         const qty = qtyElem ? parseInt(qtyElem.textContent.trim(), 10) : 1;
 
         if (!name || !name.length || !qty) {
