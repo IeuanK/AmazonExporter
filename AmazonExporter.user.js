@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Amazon Order Exporter
-// @version      0.4.3
+// @version      0.4.4
 // @description  Export Amazon order history to JSON/CSV
 // @author       IeuanK
 // @url          https://github.com/IeuanK/AmazonExporter/raw/main/AmazonExporter.user.js
